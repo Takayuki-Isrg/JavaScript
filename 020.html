@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>一覧画面</title>
+    <link rel="stylesheet" href="https://unpkg.com/sanitize.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <p>
+      店名選択：<select>
+        <option value=""></option>
+        <option value="日本橋本店">日本橋本店</option>
+        <option value="新宿店">新宿店</option>
+        <option value="長野店">長野店</option>
+      </select>
+    </p>
+
+    <form action="List.html">
+      <table>
+        <tr>
+          <th>商品ID</th>
+          <th>商品名</th>
+          <th>値段(円)</th>
+          <th>注文数</th>
+          <th>金額(円)</th>
+        </tr>
+        <tr>
+          <td>001</td>
+          <td>りんご</td>
+          <td>200</td>
+          <td>
+            <select id="select0">
+              <option>0</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+            </select>
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>007</td>
+          <td>甘栗</td>
+          <td>300</td>
+          <td>
+            <select id="select1">
+              <option>0</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+            </select>
+          </td>
+          <td></td>
+        </tr>
+      </table>
+
+      <button type="submit">送信する</button>
+    </form>
+  </body>
+</html>
