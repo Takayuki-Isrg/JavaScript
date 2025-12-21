@@ -103,4 +103,3 @@ Porcupine Tree の楽曲を題材にした **AIリスニング・コンパニオ
   - PCのIPアドレスを確認（例: `192.168.1.119`）
   - `.env` または `app.json` で `EXPO_PUBLIC_API_BASE_URL=http://192.168.1.119:4000` を設定
   - PCとスマホが同じWi-Fiネットワークに接続されているか確認
-
