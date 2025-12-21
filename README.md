@@ -1,50 +1,106 @@
-# Welcome to your Expo app 👋
+# AI Tree Sounds
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Porcupine Tree の楽曲を題材にした **AIリスニング・コンパニオン**（React Native / Expo）です。  
+ローカル楽曲リスト＋AIコメント表示に加え、**Spotify検索（ベータ）** と **YouTube検索リンク**を提供します。
 
-## Get started
+## ソースの構成（何がどこにあるか）
 
-1. Install dependencies
+- `App.js`
+  - React Navigation（Stack）を定義
+  - 全体を `HistoryProvider` でラップ（再生履歴を共有）
+- `app/index.tsx`
+  - Web初期ロード時のローディング表示（Hello Worldを置換）
+- `src/tracks.js`
+  - ローカル楽曲リスト（`id/title/artist/album/year`）と曲ごとの `comments`
+- `src/historyContext.js`
+  - 再生（閲覧）履歴の共有（`history` / `addHistory(track)`）
+  - Spotifyトラックとローカルトラックの差異を吸収して履歴を記録
+- `src/screens/HomeScreen.js`
+  - ホーム画面（ライト/ダーク切替、最近再生した曲）
+- `src/screens/SearchScreen.js`
+  - ローカル検索 + Spotify検索（ベータ） + YouTube検索リンク
+- `src/screens/PlayerScreen.js`
+  - 曲詳細 + AIコメントカード表示
+  - `expo-av` でプレビュー再生（30秒）
+  - 曲切替時にプレビュー音源を停止＆解放
+- `src/api/spotify.js`
+  - **フロント側のSpotify検索関数**
+  - `server/index.js` のプロキシAPIを呼び出す（フロントにCLIENT_SECRETを置かない）
+- `server/index.js`
+  - Spotifyプロキシ（Client Credentials Flow）
+  - `.env` に `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` を保持
 
+## 画面の挙動（概要）
+
+- **Home**
+  - テーマ切替（ライト/ダーク）
+  - 最近再生した曲（最大10件、画面表示は上位5件）
+- **Search**
+  - ローカルトラックを検索して `Player` に遷移
+  - Spotifyで検索（ベータ）→ Spotifyの結果から `preview_url` を `Player` に渡す
+  - どの曲からも「YouTubeで検索」で検索結果ページを開く
+- **Player**
+  - タイトル／アーティスト／アルバム表示
+  - AIコメントカード表示（theme/lyrics/guitar/drum/rhythm）
+  - `preview_url` があればプレビュー再生
+  - 画面表示した曲は自動で履歴に追加
+
+## Spotifyプロキシについて（重要）
+
+フロントに `CLIENT_SECRET` は置きません。  
+`src/api/spotify.js` は `server/index.js` の `/api/spotify/search` を呼び出します。
+
+### セットアップ手順（必須）
+
+1. **Spotify Developer でアプリを作成**
+   - https://developer.spotify.com/dashboard にアクセス
+   - 「Create app」→ Name: `AI Tree Sounds`、Redirect URI: `http://localhost`
+   - `Client ID` と `Client Secret` をコピー
+
+2. **`.env` ファイルを作成**
    ```bash
-   npm install
+   cd server
+   # .env ファイルを手動で作成（以下の内容をコピペ）
+   ```
+   
+   `server/.env` の内容:
+   ```env
+   SPOTIFY_CLIENT_ID=あなたのClientID
+   SPOTIFY_CLIENT_SECRET=あなたのClientSecret
+   PORT=4000
    ```
 
-2. Start the app
-
+3. **バックエンドサーバーを起動**
    ```bash
+   cd server
+   npm start
+   ```
+   
+   成功すると以下のメッセージが表示されます:
+   ```
+   ✅ Spotify プロキシサーバー起動完了
+   📍 http://localhost:4000
+   ```
+
+4. **フロントエンドを起動（別ターミナル）**
+   ```bash
+   npm start
+   # または
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+### トラブルシューティング
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **「バックエンドサーバーに接続できません」エラー**
+  - `server/index.js` が起動しているか確認（`npm start` を実行）
+  - `server/.env` に `SPOTIFY_CLIENT_ID` と `SPOTIFY_CLIENT_SECRET` が正しく設定されているか確認
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **「Spotify認証エラー」**
+  - `.env` の `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` が正しいか確認
+  - Spotify Dashboard でアプリが有効になっているか確認
 
-## Get a fresh project
+- **スマホ(実機)で動かす場合**
+  - PCのIPアドレスを確認（例: `192.168.1.119`）
+  - `.env` または `app.json` で `EXPO_PUBLIC_API_BASE_URL=http://192.168.1.119:4000` を設定
+  - PCとスマホが同じWi-Fiネットワークに接続されているか確認
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
